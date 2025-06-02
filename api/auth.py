@@ -1,5 +1,3 @@
-# 3D-Quotes-Backned/api/auth.py
-
 from fastapi import APIRouter, HTTPException, status
 from pymongo.errors import DuplicateKeyError
 

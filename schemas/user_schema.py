@@ -1,5 +1,3 @@
-# 3D-Quotes-Backned/schemas/user_schema.py
-
 from pydantic import BaseModel, EmailStr, Field, validator
 
 

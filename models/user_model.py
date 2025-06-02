@@ -1,5 +1,3 @@
-# 3D-Quotes-Backned/models/user_model.py
-
 from datetime import datetime
 
 from beanie import Document

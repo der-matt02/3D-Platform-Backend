@@ -4,21 +4,22 @@ from bson import ObjectId
 
 from schemas.quote_schema import QuoteCreateSchema, QuoteUpdateSchema, QuoteOutSchema
 from services.quote_service import create_quote, get_user_quotes, update_quote, delete_quote
+from core.auth import get_current_user
+from models.user_model import User
 
 router = APIRouter(prefix="/api/quotes", tags=["Quotes"])
-
-
-def get_current_user_id() -> str:
-    return "664e0e871fe5e2bfe80c03de"
 
 
 @router.post("/", response_model=QuoteOutSchema, status_code=status.HTTP_201_CREATED)
 async def create_quote_endpoint(
     data: QuoteCreateSchema,
-    user_id: str = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ) -> Any:
+    """
+    Crea una cotización asociada al usuario autenticado.
+    """
     try:
-        quote = await create_quote(user_id, data)
+        quote = await create_quote(str(current_user.id), data)
         return QuoteOutSchema.model_validate(quote)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear la cotización: {str(e)}")
@@ -26,27 +27,31 @@ async def create_quote_endpoint(
 
 @router.get("/", response_model=List[QuoteOutSchema])
 async def list_user_quotes(
-    user_id: str = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ) -> Any:
+    """
+    Lista las cotizaciones que pertenecen al usuario autenticado.
+    """
     try:
-        return await get_user_quotes(ObjectId(user_id))
+        return await get_user_quotes(ObjectId(str(current_user.id)))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al obtener cotizaciones: {str(e)}")
 
 
 @router.put("/{quote_id}", response_model=QuoteOutSchema)
 async def update_quote_endpoint(
-    data: QuoteUpdateSchema,  # ← viene en el body (JSON)
+    data: QuoteUpdateSchema,
     quote_id: str = Path(..., description="ID de la cotización a actualizar"),
-    user_id: str = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ) -> Any:
-    # 1) Validar que quote_id sea un ObjectId
+    """
+    Actualiza la cotización con ID=quote_id, si pertenece al usuario autenticado.
+    """
     try:
         _ = ObjectId(quote_id)
     except Exception:
         raise HTTPException(status_code=400, detail="ID inválido")
 
-    # 2) Llamar al servicio que actualiza y retorna la instancia
     try:
         updated_model = await update_quote(quote_id, data)
         if not updated_model:
@@ -56,7 +61,6 @@ async def update_quote_endpoint(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al actualizar la cotización: {str(e)}")
 
-    # 3) Convertir a QuoteOutSchema y devolver
     try:
         return QuoteOutSchema(
             id=str(updated_model.id),
@@ -81,8 +85,11 @@ async def update_quote_endpoint(
 @router.delete("/{quote_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_quote_endpoint(
     quote_id: str,
-    user_id: str = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ) -> None:
+    """
+    Elimina la cotización si pertenece al usuario autenticado.
+    """
     try:
         deleted = await delete_quote(quote_id)
         if not deleted:

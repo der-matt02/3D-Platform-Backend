@@ -1,7 +1,3 @@
-# 3D-Quotes-Backned/main.py
-
-import asyncio
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
