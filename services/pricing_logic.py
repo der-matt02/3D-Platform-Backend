@@ -21,11 +21,14 @@ def calculate_quote_summary(data: QuoteCreateSchema) -> dict:
     extra_cost = data.commercial.labor + data.commercial.post_processing
     base_cost = printing_cost + extra_cost
     with_margin = base_cost * (1 + data.commercial.margin)
+    #with_margin = base_cost * (1 + (data.commercial.margin / 100))
     final_price = with_margin * (1 + data.commercial.taxes)
+    #final_price = with_margin * (1 + (data.commercial.taxes / 100))
 
     # Diagnóstico
     grams_used = total_weight
     grams_wasted = data.model.support_weight
+    # x material usado en la impreson se desperidico en forma de soportes y purga
     waste_percentage = (grams_wasted / grams_used) * 100 if grams_used > 0 else 0
 
     return {

@@ -106,7 +106,7 @@ async def update_quote(quote_id: str, data: QuoteUpdateSchema) -> Optional[Quote
     quote_obj.model = ModelData(**payload["model"])
     quote_obj.commercial = Commercial(**payload["commercial"])
 
-    # (Si permites editar summary desde el cliente, descomenta)
+    # (Si permite editar summary desde el cliente, descomentar)
     # quote_obj.summary = Summary(**payload["summary"])
 
     # 4) Actualizar fecha de modificación
