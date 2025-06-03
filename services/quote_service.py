@@ -80,6 +80,7 @@ async def update_quote(quote_id: str, data: QuoteUpdateSchema) -> Optional[Quote
     1) Convierte quote_id a ObjectId
     2) Obtiene la cotización (Quote) con Beanie
     3) Asigna cada sección del payload a la instancia
+    3.1) Recalcula el summary
     4) Actualiza updated_at y salva con .save()
     5) Retorna la instancia actualizada (o None si no existe)
     """
@@ -98,16 +99,17 @@ async def update_quote(quote_id: str, data: QuoteUpdateSchema) -> Optional[Quote
 
     # 3) Asignar valores uno a uno
     quote_obj.quote_name = payload["quote_name"]
-
-    # Reemplazar cada subdocumento
-    quote_obj.printer = Printer(**payload["printer"])
-    quote_obj.filament = Filament(**payload["filament"])
-    quote_obj.energy = Energy(**payload["energy"])
-    quote_obj.model = ModelData(**payload["model"])
+    quote_obj.printer    = Printer(**payload["printer"])
+    quote_obj.filament   = Filament(**payload["filament"])
+    quote_obj.energy     = Energy(**payload["energy"])
+    quote_obj.model      = ModelData(**payload["model"])
     quote_obj.commercial = Commercial(**payload["commercial"])
 
-    # (Si permite editar summary desde el cliente, descomentar)
-    # quote_obj.summary = Summary(**payload["summary"])
+    # 3.1) Recalcular el summary usando calculate_quote_summary(data)
+    summary_data = calculate_quote_summary(data)
+    # Ya no intentamos generar “recommendation_summary” porque generate_optimization
+    # no retorna esa clave en este proyecto.
+    quote_obj.summary = Summary(**summary_data)
 
     # 4) Actualizar fecha de modificación
     quote_obj.updated_at = datetime.now(UTC)

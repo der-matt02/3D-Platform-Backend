@@ -9,7 +9,6 @@ from models.user_model import User
 
 router = APIRouter(prefix="/api/quotes", tags=["Quotes"])
 
-
 @router.post("/", response_model=QuoteOutSchema, status_code=status.HTTP_201_CREATED)
 async def create_quote_endpoint(
     data: QuoteCreateSchema,

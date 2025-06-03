@@ -2,9 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import settings
-from core.database import initiate_database       # <— Usa la función que inicializa Beanie
-from api.auth import router as auth_router         # <— Tu router de /auth
-from api.quotes import router as quotes_router     # <— Tu router de cotizaciones existente
+from core.database import initiate_database       # Función que inicializa Beanie
+from api.auth import router as auth_router         # Router de /auth
+from api.quotes import router as quotes_router     # Router de CRUD de cotizaciones
+from api.quote_optimization import router as optimization_router  # Router de optimización
 
 app = FastAPI(title="3D Quotes API")
 
@@ -34,3 +35,6 @@ app.include_router(auth_router, prefix="/auth")
 
 # Registrar rutas de cotizaciones
 app.include_router(quotes_router)
+
+# Registrar ruta de optimización de cotizaciones
+app.include_router(optimization_router)
