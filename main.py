@@ -38,3 +38,8 @@ app.include_router(quotes_router)
 
 # Registrar ruta de optimización de cotizaciones
 app.include_router(optimization_router)
+
+# Nueva implementacion
+from api.inverse_quote import router as inverse_quote_router
+
+app.include_router(inverse_quote_router)
